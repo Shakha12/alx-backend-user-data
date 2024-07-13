@@ -2,9 +2,7 @@
 """Session authentication with expiration module for the API.
 """
 import os
-from flask import request
 from datetime import datetime, timedelta
-
 from .session_auth import SessionAuth
 
 
@@ -37,15 +35,18 @@ class SessionExpAuth(SessionAuth):
         """Retrieves the user id of the user associated with
         a given session id.
         """
-        if session_id in self.user_id_by_session_id:
-            session_dict = self.user_id_by_session_id[session_id]
-            if self.session_duration <= 0:
-                return session_dict['user_id']
-            if 'created_at' not in session_dict:
-                return None
-            cur_time = datetime.now()
-            time_span = timedelta(seconds=self.session_duration)
-            exp_time = session_dict['created_at'] + time_span
-            if exp_time < cur_time:
-                return None
+        if session_id is None:
+            return None
+        if session_id not in self.user_id_by_session_id:
+            return None
+        session_dict = self.user_id_by_session_id[session_id]
+        if self.session_duration <= 0:
             return session_dict['user_id']
+        if 'created_at' not in session_dict:
+            return None
+        cur_time = datetime.now()
+        time_span = timedelta(seconds=self.session_duration)
+        exp_time = session_dict['created_at'] + time_span
+        if exp_time < cur_time:
+            return None
+        return session_dict['user_id']
