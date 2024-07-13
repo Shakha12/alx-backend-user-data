@@ -1,54 +1,54 @@
 #!/usr/bin/env python3
 """
-Definition of class SessionAuth
+Module for authentication using Session auth
 """
-import base64
-from uuid import uuid4
-from typing import TypeVar
+
 
 from .auth import Auth
+
 from models.user import User
+from uuid import uuid4
 
 
 class SessionAuth(Auth):
-    """ Implement Session Authorization protocol methods
+    """_summary_
     """
     user_id_by_session_id = {}
 
     def create_session(self, user_id: str = None) -> str:
-        """
-        Creates a Session ID for a user with id user_id
+        """_summary_
+
         Args:
-            user_id (str): user's user id
-        Return:
-            None is user_id is None or not a string
-            Session ID in string format
+            user_id (str, optional): _description_. Defaults to None.
+
+        Returns:
+            str: _description_
         """
         if user_id is None or not isinstance(user_id, str):
             return None
+
         id = uuid4()
         self.user_id_by_session_id[str(id)] = user_id
         return str(id)
 
     def user_id_for_session_id(self, session_id: str = None) -> str:
-        """
-        Returns a user ID based on a session ID
+        """_summary_
+
         Args:
-            session_id (str): session ID
-        Return:
-            user id or None if session_id is None or not a string
+            session_id (str, optional): _description_. Defaults to None.
+
+        Returns:
+                str: _description_
         """
         if session_id is None or not isinstance(session_id, str):
             return None
         return self.user_id_by_session_id.get(session_id)
 
     def current_user(self, request=None):
-        """
-        Return a user instance based on a cookie value
+        """_summary_
+
         Args:
-            request : request object containing cookie
-        Return:
-            User instance
+            request (_type_, optional): _description_. Defaults to None.
         """
         session_cookie = self.session_cookie(request)
         user_id = self.user_id_for_session_id(session_cookie)
@@ -56,8 +56,13 @@ class SessionAuth(Auth):
         return user
 
     def destroy_session(self, request=None):
-        """
-        Deletes a user session
+        """_summary_
+
+        Args:
+            request (_type_, optional): _description_. Defaults to None.
+
+        Returns:
+            _type_: _description_
         """
         if request is None:
             return False
