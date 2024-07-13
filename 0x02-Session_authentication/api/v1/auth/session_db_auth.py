@@ -25,11 +25,14 @@ class SessionDBAuth(SessionExpAuth):
             user_session = UserSession(**kwargs)
             user_session.save()
             return session_id
+        return None
 
     def user_id_for_session_id(self, session_id=None):
         """Retrieves the user id of the user associated with
         a given session id.
         """
+        if session_id is None:
+            return None
         try:
             sessions = UserSession.search({'session_id': session_id})
         except Exception:
@@ -46,7 +49,11 @@ class SessionDBAuth(SessionExpAuth):
     def destroy_session(self, request=None) -> bool:
         """Destroys an authenticated session.
         """
+        if request is None:
+            return False
         session_id = self.session_cookie(request)
+        if session_id is None:
+            return False
         try:
             sessions = UserSession.search({'session_id': session_id})
         except Exception:
